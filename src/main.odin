@@ -42,14 +42,24 @@ main :: proc() {
 
 	for !rl.WindowShouldClose() {
 		process_input(&level)
+		won := did_win(&level)
+
 		rl.BeginDrawing()
-
 		rl.ClearBackground(rl.BLACK)
-		render_game(&level)
 
+		render_game(&level)
+		if won do draw_win_text()
 
 		rl.EndDrawing()
 	}
+}
+
+
+draw_win_text :: proc() {
+	text_width := rl.MeasureText(WON_TEXT, FONT_SIZE)
+	x := (WINDOW_WIDTH - text_width) / 2
+	y := (WINDOW_HEIGHT - FONT_SIZE) / 2
+	rl.DrawText(WON_TEXT, i32(x), i32(y), FONT_SIZE, rl.WHITE)
 }
 
 load_level :: proc(level: ^Level) {
@@ -118,8 +128,7 @@ is_valid_move :: proc(level: ^Level, pos: Vec2i) -> bool {
 	if !within_bounds(level, pos) do return false
 	if level.board[pos.y][pos.x] == .Wall do return false
 	is_blocked_by_box, _ := box_at(level, pos)
-	if is_blocked_by_box do return false
-	return true
+	return !is_blocked_by_box
 }
 
 box_at :: proc(level: ^Level, pos: Vec2i) -> (bool, int) {
@@ -151,6 +160,18 @@ try_push_box :: proc(level: ^Level, box_index: int, direction: Vec2i) -> bool {
 		}
 	}
 	return false
+}
+
+did_win :: proc(level: ^Level) -> bool {
+	for row, y in level.board {
+		for tile, x in row {
+			if tile == .Goal {
+				box_exist, _ := box_at(level, {x, y})
+				if !box_exist do return false
+			}
+		}
+	}
+	return true
 }
 
 render_game :: proc(level: ^Level) {

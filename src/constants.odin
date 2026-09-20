@@ -8,4 +8,8 @@ WINDOW_NAME :: "Sokoban - 2D"
 
 TILE_SIZE :: 32
 
+
+WON_TEXT :: "WON!"
+FONT_SIZE :: 20
+
 Vec2 :: rl.Vector2
