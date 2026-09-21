@@ -2,6 +2,7 @@ package main
 
 import rl "vendor:raylib"
 
+
 process_input :: proc(level: ^Level) {
 	direction: Vec2i
 
@@ -72,11 +73,4 @@ did_win :: proc(level: ^Level) -> bool {
 		}
 	}
 	return true
-}
-
-draw_win_text :: proc() {
-	text_width := rl.MeasureText(WON_TEXT, FONT_SIZE)
-	x := (WINDOW_WIDTH - text_width) / 2
-	y := (WINDOW_HEIGHT - FONT_SIZE) / 2
-	rl.DrawText(WON_TEXT, i32(x), i32(y), FONT_SIZE, rl.WHITE)
 }
