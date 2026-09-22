@@ -2,65 +2,45 @@ package main
 
 import rl "vendor:raylib"
 
-render_game :: proc(level: ^Level) {
-	render_level(level)
-	render_player(level)
-	render_boxes(level)
+render_game :: proc(level: ^Level, assets: Assets) {
+	render_level(level, assets)
+	render_player(level, assets)
+	render_boxes(level, assets)
 }
 
-render_level :: proc(level: ^Level) {
+render_level :: proc(level: ^Level, assets: Assets) {
 	for row, y in level.board {
 		for tile, x in row {
 			switch tile {
 			case .Wall:
-				rl.DrawRectangle(
-					i32(x) * TILE_SIZE,
-					i32(y) * TILE_SIZE,
-					TILE_SIZE,
-					TILE_SIZE,
-					rl.GRAY,
-				)
+				rl.DrawTexture(assets.wall, i32(x) * TILE_SIZE, i32(y) * TILE_SIZE, rl.WHITE)
 
 			case .Floor:
-				rl.DrawRectangle(
-					i32(x) * TILE_SIZE,
-					i32(y) * TILE_SIZE,
-					TILE_SIZE,
-					TILE_SIZE,
-					rl.DARKGRAY,
-				)
+				rl.DrawTexture(assets.floor, i32(x) * TILE_SIZE, i32(y) * TILE_SIZE, rl.WHITE)
 
 			case .Goal:
-				rl.DrawRectangle(
-					i32(x) * TILE_SIZE,
-					i32(y) * TILE_SIZE,
-					TILE_SIZE,
-					TILE_SIZE,
-					rl.GREEN,
-				)
+				rl.DrawTexture(assets.goal, i32(x) * TILE_SIZE, i32(y) * TILE_SIZE, rl.WHITE)
 			}
 		}
 	}
 }
 
-render_player :: proc(level: ^Level) {
+render_player :: proc(level: ^Level, assets: Assets) {
 	player_x := level.player.pos.x * TILE_SIZE
 	player_y := level.player.pos.y * TILE_SIZE
-	rl.DrawRectangle(i32(player_x), i32(player_y), TILE_SIZE, TILE_SIZE, rl.BLUE)
+	rl.DrawTexture(assets.player, i32(player_x), i32(player_y), rl.WHITE)
 }
 
-render_boxes :: proc(level: ^Level) {
+render_boxes :: proc(level: ^Level, assets: Assets) {
 	for box in level.boxes {
-		rl.DrawRectangle(
+		rl.DrawTexture(
+			assets.box,
 			i32(box.pos.x) * TILE_SIZE,
 			i32(box.pos.y) * TILE_SIZE,
-			TILE_SIZE,
-			TILE_SIZE,
-			rl.PINK,
+			rl.WHITE,
 		)
 	}
 }
-
 draw_win_text :: proc() {
 	text_width := rl.MeasureText(WON_TEXT, FONT_SIZE)
 	x := (WINDOW_WIDTH - text_width) / 2

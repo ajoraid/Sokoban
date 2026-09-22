@@ -7,6 +7,8 @@ main :: proc() {
 	defer rl.CloseWindow()
 
 	level := load_level()
+	assets := load_assets()
+	defer unload_assets(assets)
 
 	for !rl.WindowShouldClose() {
 		process_input(&level)
@@ -15,7 +17,8 @@ main :: proc() {
 		rl.BeginDrawing()
 		rl.ClearBackground(rl.BLACK)
 
-		render_game(&level)
+		render_game(&level, assets)
+
 		if won do draw_win_text()
 
 		rl.EndDrawing()
