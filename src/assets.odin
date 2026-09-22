@@ -31,7 +31,7 @@ load_assets :: proc() -> Assets {
 	}
 }
 
-unload_assets :: proc(assets: Assets) {
+unload_assets :: proc(assets: ^Assets) {
 	rl.UnloadTexture(assets.player)
 	rl.UnloadTexture(assets.box)
 	rl.UnloadTexture(assets.floor)

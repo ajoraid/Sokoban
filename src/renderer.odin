@@ -2,13 +2,13 @@ package main
 
 import rl "vendor:raylib"
 
-render_game :: proc(level: ^Level, assets: Assets) {
-	render_level(level, assets)
-	render_player(level, assets)
-	render_boxes(level, assets)
+render_game :: proc(gs: ^Game_State) {
+	render_level(&gs.level, &gs.assets)
+	render_player(&gs.level, &gs.assets)
+	render_boxes(&gs.level, &gs.assets)
 }
 
-render_level :: proc(level: ^Level, assets: Assets) {
+render_level :: proc(level: ^Level, assets: ^Assets) {
 	for row, y in level.board {
 		for tile, x in row {
 			switch tile {
@@ -25,13 +25,13 @@ render_level :: proc(level: ^Level, assets: Assets) {
 	}
 }
 
-render_player :: proc(level: ^Level, assets: Assets) {
+render_player :: proc(level: ^Level, assets: ^Assets) {
 	player_x := level.player.pos.x * TILE_SIZE
 	player_y := level.player.pos.y * TILE_SIZE
 	rl.DrawTexture(assets.player, i32(player_x), i32(player_y), rl.WHITE)
 }
 
-render_boxes :: proc(level: ^Level, assets: Assets) {
+render_boxes :: proc(level: ^Level, assets: ^Assets) {
 	for box in level.boxes {
 		rl.DrawTexture(
 			assets.box,

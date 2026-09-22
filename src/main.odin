@@ -1,26 +1,30 @@
 package main
 
-import rl "vendor:raylib"
+import "core:fmt"
+import "core:mem"
 
 main :: proc() {
-	rl.InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_NAME)
-	defer rl.CloseWindow()
+	when ODIN_DEBUG {
+		track: mem.Tracking_Allocator
+		mem.tracking_allocator_init(&track, context.allocator)
+		context.allocator = mem.tracking_allocator(&track)
 
-	level := load_level()
-	assets := load_assets()
-	defer unload_assets(assets)
-
-	for !rl.WindowShouldClose() {
-		process_input(&level)
-		won := did_win(&level)
-
-		rl.BeginDrawing()
-		rl.ClearBackground(rl.BLACK)
-
-		render_game(&level, assets)
-
-		if won do draw_win_text()
-
-		rl.EndDrawing()
+		defer {
+			if len(track.allocation_map) > 0 {
+				fmt.eprintf("=== %v allocations not freed: ===\n", len(track.allocation_map))
+				for _, entry in track.allocation_map {
+					fmt.eprintf("- %v bytes @ %v\n", entry.size, entry.location)
+				}
+			}
+			if len(track.bad_free_array) > 0 {
+				fmt.eprintf("=== %v incorrect frees: ===\n", len(track.bad_free_array))
+				for entry in track.bad_free_array {
+					fmt.eprintf("- %p @ %v\n", entry.memory, entry.location)
+				}
+			}
+			mem.tracking_allocator_destroy(&track)
+		}
 	}
+
+	game_init()
 }

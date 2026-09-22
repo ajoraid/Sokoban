@@ -28,9 +28,9 @@ Level :: struct {
 	boxes:  [dynamic]Box,
 }
 
-
 load_level :: proc() -> Level {
 	level_data, ok := os.read_entire_file_from_path("src/levels/level_000.dat", context.allocator)
+	defer delete(level_data)
 	assert(ok == nil, "Failed to lead level data.")
 
 	level := Level{}
@@ -72,4 +72,12 @@ load_level :: proc() -> Level {
 	level.height = len(level.board)
 
 	return level
+}
+
+unload_level :: proc(level: ^Level) {
+	for row in level.board {
+		delete(row)
+	}
+	delete(level.board)
+	delete(level.boxes)
 }
