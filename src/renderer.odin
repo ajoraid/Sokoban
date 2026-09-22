@@ -11,34 +11,32 @@ render_game :: proc(gs: ^Game_State) {
 render_level :: proc(gs: ^Game_State) {
 	for row, y in gs.level.board {
 		for tile, x in row {
+			pos := Vec2{f32(x) * TILE_SIZE, f32(y) * TILE_SIZE}
 			switch tile {
 			case .Wall:
-				rl.DrawTexture(gs.assets.wall, i32(x) * TILE_SIZE, i32(y) * TILE_SIZE, rl.WHITE)
+				rl.DrawTextureEx(gs.assets.wall, pos, 0, SCALE, rl.WHITE)
 
 			case .Floor:
-				rl.DrawTexture(gs.assets.floor, i32(x) * TILE_SIZE, i32(y) * TILE_SIZE, rl.WHITE)
+				rl.DrawTextureEx(gs.assets.floor, pos, 0, SCALE, rl.WHITE)
 
 			case .Goal:
-				rl.DrawTexture(gs.assets.goal, i32(x) * TILE_SIZE, i32(y) * TILE_SIZE, rl.WHITE)
+				rl.DrawTextureEx(gs.assets.goal, pos, 0, SCALE, rl.WHITE)
 			}
 		}
 	}
 }
 
 render_player :: proc(gs: ^Game_State) {
-	player_x := gs.level.player.pos.x * TILE_SIZE
-	player_y := gs.level.player.pos.y * TILE_SIZE
-	rl.DrawTexture(gs.assets.player, i32(player_x), i32(player_y), rl.WHITE)
+	player_x := f32(gs.level.player.pos.x) * TILE_SIZE
+	player_y := f32(gs.level.player.pos.y) * TILE_SIZE
+	pos := Vec2{player_x, player_y}
+	rl.DrawTextureEx(gs.assets.player, pos, 0, SCALE, rl.WHITE)
 }
 
 render_boxes :: proc(gs: ^Game_State) {
 	for box in gs.level.boxes {
-		rl.DrawTexture(
-			gs.assets.box,
-			i32(box.pos.x) * TILE_SIZE,
-			i32(box.pos.y) * TILE_SIZE,
-			rl.WHITE,
-		)
+		pos := Vec2{f32(box.pos.x) * TILE_SIZE, f32(box.pos.y) * TILE_SIZE}
+		rl.DrawTextureEx(gs.assets.box, pos, 0, SCALE, rl.WHITE)
 	}
 }
 draw_win_text :: proc() {
