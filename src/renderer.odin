@@ -3,38 +3,38 @@ package main
 import rl "vendor:raylib"
 
 render_game :: proc(gs: ^Game_State) {
-	render_level(&gs.level, &gs.assets)
-	render_player(&gs.level, &gs.assets)
-	render_boxes(&gs.level, &gs.assets)
+	render_level(gs)
+	render_player(gs)
+	render_boxes(gs)
 }
 
-render_level :: proc(level: ^Level, assets: ^Assets) {
-	for row, y in level.board {
+render_level :: proc(gs: ^Game_State) {
+	for row, y in gs.level.board {
 		for tile, x in row {
 			switch tile {
 			case .Wall:
-				rl.DrawTexture(assets.wall, i32(x) * TILE_SIZE, i32(y) * TILE_SIZE, rl.WHITE)
+				rl.DrawTexture(gs.assets.wall, i32(x) * TILE_SIZE, i32(y) * TILE_SIZE, rl.WHITE)
 
 			case .Floor:
-				rl.DrawTexture(assets.floor, i32(x) * TILE_SIZE, i32(y) * TILE_SIZE, rl.WHITE)
+				rl.DrawTexture(gs.assets.floor, i32(x) * TILE_SIZE, i32(y) * TILE_SIZE, rl.WHITE)
 
 			case .Goal:
-				rl.DrawTexture(assets.goal, i32(x) * TILE_SIZE, i32(y) * TILE_SIZE, rl.WHITE)
+				rl.DrawTexture(gs.assets.goal, i32(x) * TILE_SIZE, i32(y) * TILE_SIZE, rl.WHITE)
 			}
 		}
 	}
 }
 
-render_player :: proc(level: ^Level, assets: ^Assets) {
-	player_x := level.player.pos.x * TILE_SIZE
-	player_y := level.player.pos.y * TILE_SIZE
-	rl.DrawTexture(assets.player, i32(player_x), i32(player_y), rl.WHITE)
+render_player :: proc(gs: ^Game_State) {
+	player_x := gs.level.player.pos.x * TILE_SIZE
+	player_y := gs.level.player.pos.y * TILE_SIZE
+	rl.DrawTexture(gs.assets.player, i32(player_x), i32(player_y), rl.WHITE)
 }
 
-render_boxes :: proc(level: ^Level, assets: ^Assets) {
-	for box in level.boxes {
+render_boxes :: proc(gs: ^Game_State) {
+	for box in gs.level.boxes {
 		rl.DrawTexture(
-			assets.box,
+			gs.assets.box,
 			i32(box.pos.x) * TILE_SIZE,
 			i32(box.pos.y) * TILE_SIZE,
 			rl.WHITE,
