@@ -28,14 +28,14 @@ process_input :: proc(gs: ^Game_State) {
 
 	next_pos := Vec2i{level.player.pos.x + direction.x, level.player.pos.y + direction.y}
 	if is_valid_move(gs, next_pos) {
-		if did_move do rl.PlaySound(gs.audio.walk)
+		rl.PlaySound(gs.audio.walk)
 		level.player.pos.x += direction.x
 		level.player.pos.y += direction.y
 	} else {
 		box_exists, box_index := box_at(gs, next_pos)
 		if box_exists {
 			if try_push_box(gs, box_index, direction) {
-				if did_move do rl.PlaySound(gs.audio.push)
+				rl.PlaySound(gs.audio.push)
 				level.player.pos = next_pos
 			}
 		}
@@ -74,8 +74,12 @@ try_push_box :: proc(gs: ^Game_State, box_index: int, direction: Vec2i) -> bool 
 		box_exists, _ := box_at(gs, push_pos)
 		if box_exists do return false
 		switch level.board[push_pos.y][push_pos.x] {
-		case .Floor, .Goal:
+		case .Floor:
 			level.boxes[box_index].pos = push_pos
+			return true
+		case .Goal:
+			level.boxes[box_index].pos = push_pos
+			rl.PlaySound(gs.audio.goal)
 			return true
 		case .Wall:
 			return false

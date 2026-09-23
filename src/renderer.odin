@@ -20,7 +20,7 @@ render_level :: proc(gs: ^Game_State) {
 				rl.DrawTextureEx(gs.assets.floor, pos, 0, SCALE, rl.WHITE)
 
 			case .Goal:
-				rl.DrawTextureEx(gs.assets.goal, pos, 0, SCALE, rl.WHITE)
+				rl.DrawTextureEx(gs.assets.goal, pos, 0, SCALE, rl.GREEN)
 			}
 		}
 	}
