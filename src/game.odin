@@ -6,6 +6,7 @@ Game_State :: struct {
 	level:  Level,
 	assets: Assets,
 	audio:  Audio,
+	won:    bool,
 }
 
 game_init :: proc() {
@@ -16,7 +17,11 @@ game_init :: proc() {
 		level  = load_level(),
 		assets = load_assets(),
 		audio  = load_audio(),
+		won    = false,
 	}
+
+	rl.PlayMusicStream(gs.audio.background)
+	rl.SetMusicVolume(gs.audio.background, 0.2)
 
 	defer rl.CloseWindow()
 	defer unload_level(&gs.level)
@@ -24,18 +29,26 @@ game_init :: proc() {
 	defer unload_audio(&gs.audio)
 
 	for !rl.WindowShouldClose() {
+		rl.UpdateMusicStream(gs.audio.background)
 		dt := rl.GetFrameTime()
 		process_input(&gs)
 		update_player_animation(&gs, dt)
 
-		won := did_win(&gs)
+		was_won := gs.won
+		gs.won = did_win(&gs)
 
 		rl.BeginDrawing()
 		rl.ClearBackground(rl.BLACK)
 
 		render_game(&gs)
 
-		if won do draw_win_text()
+		if !was_won && gs.won {
+			rl.PlaySound(gs.audio.win)
+		}
+
+		if gs.won {
+			draw_win_text()
+		}
 
 		rl.EndDrawing()
 	}

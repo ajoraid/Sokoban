@@ -7,8 +7,8 @@ Vec2i :: struct {
 }
 
 Direction :: enum {
-	Up,
 	Down,
+	Up,
 	Left,
 	Right,
 }
