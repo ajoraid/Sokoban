@@ -5,23 +5,28 @@ import rl "vendor:raylib"
 process_input :: proc(gs: ^Game_State) {
 	level := &gs.level
 	direction: Vec2i
+	facing: Direction
 	did_move := false
 
 	if rl.IsKeyPressed(.A) {
 		did_move = true
 		direction = Vec2i{-1, 0}
+		facing = .Left
 	}
 	if rl.IsKeyPressed(.D) {
 		did_move = true
 		direction = Vec2i{1, 0}
+		facing = .Right
 	}
 	if rl.IsKeyPressed(.S) {
 		did_move = true
 		direction = Vec2i{0, 1}
+		facing = .Down
 	}
 	if rl.IsKeyPressed(.W) {
 		did_move = true
 		direction = Vec2i{0, -1}
+		facing = .Up
 	}
 
 	if !did_move do return
@@ -31,12 +36,19 @@ process_input :: proc(gs: ^Game_State) {
 		rl.PlaySound(gs.audio.walk)
 		level.player.pos.x += direction.x
 		level.player.pos.y += direction.y
+		level.player.frame = 0
+		level.player.animating = true
+		level.player.facing = facing
 	} else {
 		box_exists, box_index := box_at(gs, next_pos)
 		if box_exists {
 			if try_push_box(gs, box_index, direction) {
 				rl.PlaySound(gs.audio.push)
 				level.player.pos = next_pos
+				level.player.frame = 0
+				level.player.animating = true
+				level.player.facing = facing
+
 			}
 		}
 	}

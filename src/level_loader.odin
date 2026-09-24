@@ -6,8 +6,19 @@ Vec2i :: struct {
 	x, y: int,
 }
 
+Direction :: enum {
+	Up,
+	Down,
+	Left,
+	Right,
+}
+
 Entity :: struct {
-	pos: Vec2i,
+	pos:         Vec2i,
+	frame:       int,
+	animating:   bool,
+	frame_timer: f32,
+	facing:      Direction,
 }
 
 Tile :: enum {

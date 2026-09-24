@@ -2,14 +2,21 @@ package main
 
 import rl "vendor:raylib"
 
-WINDOW_WIDTH :: 800
-WINDOW_HEIGHT :: 480
-WINDOW_NAME :: "Sokoban - 2D"
-
 TILE_SIZE :: 32
+PADDING :: TILE_SIZE
+
+WINDOW_WIDTH :: 25 * TILE_SIZE + PADDING * 2
+WINDOW_HEIGHT :: 15 * TILE_SIZE + PADDING * 2
+WINDOW_NAME :: "Sokoban"
+
 SCALE :: 1.0
 
 WON_TEXT :: "WON!"
 FONT_SIZE :: 20
+
+
+PLAYER_FRAME_DURATION :: 0.05
+
+TEXTURE_FRAME :: 16
 
 Vec2 :: rl.Vector2

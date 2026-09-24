@@ -24,7 +24,10 @@ game_init :: proc() {
 	defer unload_audio(&gs.audio)
 
 	for !rl.WindowShouldClose() {
+		dt := rl.GetFrameTime()
 		process_input(&gs)
+		update_player_animation(&gs, dt)
+
 		won := did_win(&gs)
 
 		rl.BeginDrawing()
