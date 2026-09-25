@@ -19,4 +19,23 @@ PLAYER_FRAME_DURATION :: 0.05
 
 TEXTURE_FRAME :: 16
 
+
 Vec2 :: rl.Vector2
+
+
+// SOURCES
+WALL_SOURCE :: rl.Rectangle {
+	x      = 0,
+	y      = 48,
+	width  = TEXTURE_FRAME,
+	height = TEXTURE_FRAME,
+}
+
+
+// also background so this is grass.
+FLOOR_SOURCE :: rl.Rectangle {
+	x      = 0,
+	y      = 16,
+	width  = TEXTURE_FRAME,
+	height = TEXTURE_FRAME,
+}

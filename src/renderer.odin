@@ -1,5 +1,6 @@
 package main
 
+import "core:fmt"
 import rl "vendor:raylib"
 
 render_game :: proc(gs: ^Game_State) {
@@ -13,43 +14,39 @@ render_level :: proc(gs: ^Game_State) {
 	for row, y in gs.level.board {
 		for tile, x in row {
 			pos := grid_to_screen({x, y})
-			switch tile {
+			#partial switch tile {
 			case .Wall:
-				source := rl.Rectangle {
-					x      = 0,
-					y      = 48,
-					width  = TEXTURE_FRAME,
-					height = TEXTURE_FRAME,
-				}
-
-				dest := rl.Rectangle {
-					x      = pos.x,
-					y      = pos.y,
-					width  = TILE_SIZE,
-					height = TILE_SIZE,
-				}
-
-				rl.DrawTexturePro(gs.assets.tileset, source, dest, Vec2{0, 0}, 0, rl.WHITE)
+				dest := tile_destination(pos)
+				rl.DrawTexturePro(
+					gs.assets.tileset,
+					get_source_for_tile(.Wall),
+					dest,
+					Vec2{0, 0},
+					0,
+					rl.WHITE,
+				)
 
 			case .Floor:
-				source := rl.Rectangle {
-					x      = 0,
-					y      = 16,
-					width  = TEXTURE_FRAME,
-					height = TEXTURE_FRAME,
-				}
-
-				dest := rl.Rectangle {
-					x      = pos.x,
-					y      = pos.y,
-					width  = TILE_SIZE,
-					height = TILE_SIZE,
-				}
-
-				rl.DrawTexturePro(gs.assets.tileset, source, dest, Vec2{0, 0}, 0, rl.WHITE)
+				dest := tile_destination(pos)
+				rl.DrawTexturePro(
+					gs.assets.tileset,
+					get_source_for_tile(.Floor),
+					dest,
+					Vec2{0, 0},
+					0,
+					rl.WHITE,
+				)
 
 			case .Goal:
-				rl.DrawTextureEx(gs.assets.goal, pos, 0, SCALE, rl.GREEN)
+				dest := tile_destination(pos)
+				rl.DrawTexturePro(
+					gs.assets.tileset,
+					get_source_for_tile(.Goal),
+					dest,
+					Vec2{0, 0},
+					0,
+					rl.WHITE,
+				)
 			}
 		}
 	}
@@ -76,40 +73,17 @@ render_player :: proc(gs: ^Game_State) {
 render_boxes :: proc(gs: ^Game_State) {
 	for box in gs.level.boxes {
 		pos := grid_to_screen(box.pos)
-		source := rl.Rectangle {
-			x      = 0,
-			y      = 64,
-			width  = TEXTURE_FRAME,
-			height = TEXTURE_FRAME,
-		}
-
-		dest := rl.Rectangle {
-			x      = pos.x,
-			y      = pos.y,
-			width  = TILE_SIZE,
-			height = TILE_SIZE,
-		}
+		source := get_source_for_tile(.Box)
+		dest := tile_destination(pos)
 		rl.DrawTexturePro(gs.assets.tileset, source, dest, Vec2{0, 0}, 0, rl.WHITE)
 	}
 }
 
 render_background :: proc(gs: ^Game_State) {
-	source := rl.Rectangle {
-		x      = 0,
-		y      = 16,
-		width  = TEXTURE_FRAME,
-		height = TEXTURE_FRAME,
-	}
-
 	for y := 0; y < WINDOW_HEIGHT; y += TILE_SIZE {
 		for x := 0; x < WINDOW_WIDTH; x += TILE_SIZE {
-			dest := rl.Rectangle {
-				x      = f32(x),
-				y      = f32(y),
-				width  = TILE_SIZE,
-				height = TILE_SIZE,
-			}
-
+			dest := tile_destination({f32(x), f32(y)})
+			source := get_source_for_tile(.Floor)
 			rl.DrawTexturePro(gs.assets.tileset, source, dest, Vec2{0, 0}, 0, rl.WHITE)
 		}
 	}
@@ -124,4 +98,31 @@ draw_win_text :: proc() {
 
 grid_to_screen :: proc(pos: Vec2i) -> Vec2 {
 	return Vec2{PADDING + f32(pos.x) * TILE_SIZE, PADDING + f32(pos.y) * TILE_SIZE}
+}
+
+get_source_for_tile :: proc(tile: Tile) -> rl.Rectangle {
+	switch tile {
+	case .Wall:
+		return tile_source(0, 48)
+	case .Floor:
+		return tile_source(0, 16)
+	case .Goal:
+		return tile_source(48, 1)
+	case .Box:
+		return tile_source(0, 64)
+	}
+	return {}
+}
+
+tile_source :: proc(col, row: f32) -> rl.Rectangle {
+	return {
+		x = col * TEXTURE_FRAME,
+		y = row * TEXTURE_FRAME,
+		width = TEXTURE_FRAME,
+		height = TEXTURE_FRAME,
+	}
+}
+
+tile_destination :: proc(pos: Vec2) -> rl.Rectangle {
+	return {x = pos.x, y = pos.y, width = TILE_SIZE, height = TILE_SIZE}
 }

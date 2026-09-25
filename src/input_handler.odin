@@ -93,7 +93,7 @@ try_push_box :: proc(gs: ^Game_State, box_index: int, direction: Vec2i) -> bool 
 			level.boxes[box_index].pos = push_pos
 			rl.PlaySound(gs.audio.goal)
 			return true
-		case .Wall:
+		case .Wall, .Box:
 			return false
 		}
 	}

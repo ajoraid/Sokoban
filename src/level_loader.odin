@@ -25,6 +25,7 @@ Tile :: enum {
 	Wall,
 	Floor,
 	Goal,
+	Box,
 }
 
 Box :: struct {
