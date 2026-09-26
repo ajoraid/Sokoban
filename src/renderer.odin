@@ -99,6 +99,10 @@ grid_to_screen :: proc(pos: Vec2i) -> Vec2 {
 	return Vec2{PADDING + f32(pos.x) * TILE_SIZE, PADDING + f32(pos.y) * TILE_SIZE}
 }
 
+screen_to_grid :: proc(pos: Vec2) -> Vec2i {
+	return {int((pos.x - PADDING) / TILE_SIZE), int((pos.y - PADDING) / TILE_SIZE)}
+}
+
 get_source_for_tile :: proc(tile: Tile) -> rl.Rectangle {
 	switch tile {
 	case .Wall:

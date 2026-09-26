@@ -1,12 +1,21 @@
 package main
 
+import "core:fmt"
+import "core:sys/wasm/wasi"
 import rl "vendor:raylib"
 
+Game_Mode :: enum {
+	Playing,
+	Editing,
+}
+
 Game_State :: struct {
-	level:  Level,
-	assets: Assets,
-	audio:  Audio,
-	won:    bool,
+	mode:        Game_Mode,
+	editor_tool: Editor_Tool,
+	level:       Level,
+	assets:      Assets,
+	audio:       Audio,
+	won:         bool,
 }
 
 game_init :: proc() {
@@ -14,10 +23,12 @@ game_init :: proc() {
 	rl.InitAudioDevice()
 
 	gs := Game_State {
-		level  = load_level(),
-		assets = load_assets(),
-		audio  = load_audio(),
-		won    = false,
+		mode        = .Playing,
+		editor_tool = .Wall,
+		level       = load_level(),
+		assets      = load_assets(),
+		audio       = load_audio(),
+		won         = false,
 	}
 
 	rl.PlayMusicStream(gs.audio.background)
@@ -29,27 +40,42 @@ game_init :: proc() {
 	defer unload_audio(&gs.audio)
 
 	for !rl.WindowShouldClose() {
-		rl.UpdateMusicStream(gs.audio.background)
 		dt := rl.GetFrameTime()
-		process_input(&gs)
-		update_player_animation(&gs, dt)
 
-		was_won := gs.won
-		gs.won = did_win(&gs)
+		rl.UpdateMusicStream(gs.audio.background)
+
+		process_game_mode(&gs, dt)
 
 		rl.BeginDrawing()
 		rl.ClearBackground(rl.BLACK)
 
 		render_game(&gs)
 
+		if gs.mode == .Editing do process_level_editor_rendering(&gs)
+		if gs.mode == .Playing && gs.won do draw_win_text()
+
+		rl.EndDrawing()
+	}
+}
+
+process_game_mode :: proc(gs: ^Game_State, dt: f32) {
+	if rl.IsKeyPressed(.F1) {
+		if gs.mode == .Playing {
+			gs.mode = .Editing
+		} else {
+			gs.mode = .Playing
+		}
+	}
+	switch gs.mode {
+	case .Playing:
+		process_input(gs)
+		update_player_animation(gs, dt)
+		was_won := gs.won
+		gs.won = did_win(gs)
 		if !was_won && gs.won {
 			rl.PlaySound(gs.audio.win)
 		}
-
-		if gs.won {
-			draw_win_text()
-		}
-
-		rl.EndDrawing()
+	case .Editing:
+		process_level_editor_input(gs)
 	}
 }
