@@ -57,7 +57,7 @@ process_input :: proc(gs: ^Game_State) {
 is_valid_move :: proc(gs: ^Game_State, pos: Vec2i) -> bool {
 	level := &gs.level
 	if !within_bounds(gs, pos) do return false
-	if level.board[pos.y][pos.x] == .Wall do return false
+	if level.board[pos.y][pos.x].kind == .Solid do return false
 	is_blocked_by_box, _ := box_at(gs, pos)
 	return !is_blocked_by_box
 }
@@ -85,7 +85,7 @@ try_push_box :: proc(gs: ^Game_State, box_index: int, direction: Vec2i) -> bool 
 	if within_bounds(gs, push_pos) {
 		box_exists, _ := box_at(gs, push_pos)
 		if box_exists do return false
-		switch level.board[push_pos.y][push_pos.x] {
+		switch level.board[push_pos.y][push_pos.x].kind {
 		case .Floor:
 			level.boxes[box_index].pos = push_pos
 			return true
@@ -93,7 +93,7 @@ try_push_box :: proc(gs: ^Game_State, box_index: int, direction: Vec2i) -> bool 
 			level.boxes[box_index].pos = push_pos
 			rl.PlaySound(gs.audio.goal)
 			return true
-		case .Wall, .Box:
+		case .Solid:
 			return false
 		}
 	}
@@ -104,7 +104,7 @@ did_win :: proc(gs: ^Game_State) -> bool {
 	level := &gs.level
 	for row, y in level.board {
 		for tile, x in row {
-			if tile == .Goal {
+			if tile.kind == .Goal {
 				box_exist, _ := box_at(gs, {x, y})
 				if !box_exist do return false
 			}

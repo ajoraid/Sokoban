@@ -24,7 +24,7 @@ game_init :: proc() {
 
 	gs := Game_State {
 		mode        = .Playing,
-		editor_tool = .Wall,
+		editor_tool = .Grass,
 		level       = load_level(),
 		assets      = load_assets(),
 		audio       = load_audio(),
@@ -51,7 +51,7 @@ game_init :: proc() {
 
 		render_game(&gs)
 
-		if gs.mode == .Editing do process_level_editor_rendering(&gs)
+		if gs.mode == .Editing do render_editor(&gs)
 		if gs.mode == .Playing && gs.won do draw_win_text()
 
 		rl.EndDrawing()

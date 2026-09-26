@@ -13,23 +13,23 @@ render_level :: proc(gs: ^Game_State) {
 	for row, y in gs.level.board {
 		for tile, x in row {
 			pos := grid_to_screen({x, y})
-			#partial switch tile {
-			case .Wall:
+			#partial switch tile.visual {
+			case .Water:
 				dest := tile_destination(pos)
 				rl.DrawTexturePro(
 					gs.assets.tileset,
-					get_source_for_tile(.Wall),
+					get_source_for_tile(.Water),
 					dest,
 					Vec2{0, 0},
 					0,
 					rl.WHITE,
 				)
 
-			case .Floor:
+			case .Grass:
 				dest := tile_destination(pos)
 				rl.DrawTexturePro(
 					gs.assets.tileset,
-					get_source_for_tile(.Floor),
+					get_source_for_tile(.Grass),
 					dest,
 					Vec2{0, 0},
 					0,
@@ -82,7 +82,7 @@ render_background :: proc(gs: ^Game_State) {
 	for y := 0; y < WINDOW_HEIGHT; y += TILE_SIZE {
 		for x := 0; x < WINDOW_WIDTH; x += TILE_SIZE {
 			dest := tile_destination({f32(x), f32(y)})
-			source := get_source_for_tile(.Floor)
+			source := get_source_for_tile(.Grass)
 			rl.DrawTexturePro(gs.assets.tileset, source, dest, Vec2{0, 0}, 0, rl.WHITE)
 		}
 	}
@@ -96,18 +96,18 @@ draw_win_text :: proc() {
 }
 
 grid_to_screen :: proc(pos: Vec2i) -> Vec2 {
-	return Vec2{PADDING + f32(pos.x) * TILE_SIZE, PADDING + f32(pos.y) * TILE_SIZE}
+	return {f32(pos.x) * TILE_SIZE, f32(pos.y) * TILE_SIZE}
 }
 
 screen_to_grid :: proc(pos: Vec2) -> Vec2i {
-	return {int((pos.x - PADDING) / TILE_SIZE), int((pos.y - PADDING) / TILE_SIZE)}
+	return {int(pos.x / TILE_SIZE), int(pos.y / TILE_SIZE)}
 }
 
-get_source_for_tile :: proc(tile: Tile) -> rl.Rectangle {
+get_source_for_tile :: proc(tile: Tile_Visual) -> rl.Rectangle {
 	switch tile {
-	case .Wall:
+	case .Water:
 		return tile_source(0, 48)
-	case .Floor:
+	case .Grass:
 		return tile_source(0, 16)
 	case .Goal:
 		return tile_source(48, 1)

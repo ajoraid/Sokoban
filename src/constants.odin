@@ -3,10 +3,9 @@ package main
 import rl "vendor:raylib"
 
 TILE_SIZE :: 32
-PADDING :: TILE_SIZE
 
-WINDOW_WIDTH :: 25 * TILE_SIZE + PADDING * 2
-WINDOW_HEIGHT :: 15 * TILE_SIZE + PADDING * 2
+WINDOW_WIDTH :: 25 * TILE_SIZE
+WINDOW_HEIGHT :: 15 * TILE_SIZE
 WINDOW_NAME :: "Sokoban"
 
 SCALE :: 1.0

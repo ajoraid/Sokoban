@@ -4,16 +4,16 @@ import "core:fmt"
 import rl "vendor:raylib"
 
 Editor_Tool :: enum {
-	Wall,
-	Floor,
+	Grass,
+	Water,
 	Goal,
 	Box,
 	Player,
 }
 
 process_level_editor_input :: proc(gs: ^Game_State) {
-	if rl.IsKeyPressed(.ONE) do gs.editor_tool = .Wall
-	if rl.IsKeyPressed(.TWO) do gs.editor_tool = .Floor
+	if rl.IsKeyPressed(.ONE) do gs.editor_tool = .Water
+	if rl.IsKeyPressed(.TWO) do gs.editor_tool = .Grass
 	if rl.IsKeyPressed(.THREE) do gs.editor_tool = .Goal
 	if rl.IsKeyPressed(.FOUR) do gs.editor_tool = .Box
 	if rl.IsKeyPressed(.FIVE) do gs.editor_tool = .Player
@@ -22,12 +22,21 @@ process_level_editor_input :: proc(gs: ^Game_State) {
 	if rl.IsMouseButtonDown(.LEFT) {
 		if within_bounds(gs, grid_pos) {
 			switch gs.editor_tool {
-			case .Wall:
-				gs.level.board[grid_pos.y][grid_pos.x] = .Wall
-			case .Floor:
-				gs.level.board[grid_pos.y][grid_pos.x] = .Floor
+			case .Water:
+				gs.level.board[grid_pos.y][grid_pos.x] = Tile {
+					kind   = .Solid,
+					visual = .Water,
+				}
+			case .Grass:
+				gs.level.board[grid_pos.y][grid_pos.x] = Tile {
+					kind   = .Floor,
+					visual = .Grass,
+				}
 			case .Goal:
-				gs.level.board[grid_pos.y][grid_pos.x] = .Goal
+				gs.level.board[grid_pos.y][grid_pos.x] = Tile {
+					kind   = .Goal,
+					visual = .Goal,
+				}
 			case .Box:
 				box_exists, _ := box_at(gs, grid_pos)
 				if !box_exists {
@@ -47,13 +56,16 @@ process_level_editor_input :: proc(gs: ^Game_State) {
 			if box_exists {
 				ordered_remove(&gs.level.boxes, index)
 			} else {
-				gs.level.board[grid_pos.y][grid_pos.x] = .Floor
+				gs.level.board[grid_pos.y][grid_pos.x] = Tile {
+					kind   = .Floor,
+					visual = .Grass,
+				}
 			}
 		}
 	}
 }
 
-process_level_editor_rendering :: proc(gs: ^Game_State) {
+render_editor :: proc(gs: ^Game_State) {
 	set_editor_tool_text(gs.editor_tool)
 	mouse_pos := rl.GetMousePosition()
 	grid_pos := screen_to_grid(mouse_pos)
@@ -67,10 +79,10 @@ set_editor_tool_text :: proc(tool: Editor_Tool) {
 	tool_text: cstring = "Wall"
 
 	switch tool {
-	case .Wall:
-		tool_text = "Wall"
-	case .Floor:
-		tool_text = "Floor"
+	case .Water:
+		tool_text = "Water"
+	case .Grass:
+		tool_text = "Grass"
 	case .Goal:
 		tool_text = "Goal"
 	case .Box:
