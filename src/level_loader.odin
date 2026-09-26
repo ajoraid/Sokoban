@@ -32,6 +32,7 @@ Tile_Visual :: enum {
 	Water,
 	Goal,
 	Box,
+	Wall,
 }
 
 Tile :: struct {
@@ -57,6 +58,7 @@ Level :: struct {
  ' ' -> kind = floor | visual = grass
  '#' -> kind = solid | visual = water
  '.' -> kind = goal  | visual = goal
+ 'w' -> kind = solid | visual = wall
 */
 
 load_level :: proc() -> Level {
@@ -75,6 +77,8 @@ load_level :: proc() -> Level {
 			current_row = make([dynamic]Tile)
 			y += 1
 			x = 0
+		case 'w':
+			append(&current_row, Tile{kind = .Solid, visual = .Wall})
 		case '#':
 			append(&current_row, Tile{kind = .Solid, visual = .Water})
 			x += 1

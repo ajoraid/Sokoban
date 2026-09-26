@@ -13,9 +13,9 @@ render_level :: proc(gs: ^Game_State) {
 	for row, y in gs.level.board {
 		for tile, x in row {
 			pos := grid_to_screen({x, y})
+			dest := tile_destination(pos)
 			#partial switch tile.visual {
 			case .Water:
-				dest := tile_destination(pos)
 				rl.DrawTexturePro(
 					gs.assets.tileset,
 					get_source_for_tile(.Water),
@@ -25,8 +25,17 @@ render_level :: proc(gs: ^Game_State) {
 					rl.WHITE,
 				)
 
+			case .Wall:
+				rl.DrawTexturePro(
+					gs.assets.tileset,
+					get_source_for_tile(.Wall),
+					dest,
+					Vec2{0, 0},
+					0,
+					rl.WHITE,
+				)
+
 			case .Grass:
-				dest := tile_destination(pos)
 				rl.DrawTexturePro(
 					gs.assets.tileset,
 					get_source_for_tile(.Grass),
@@ -37,7 +46,6 @@ render_level :: proc(gs: ^Game_State) {
 				)
 
 			case .Goal:
-				dest := tile_destination(pos)
 				rl.DrawTexturePro(
 					gs.assets.tileset,
 					get_source_for_tile(.Goal),
@@ -113,6 +121,8 @@ get_source_for_tile :: proc(tile: Tile_Visual) -> rl.Rectangle {
 		return tile_source(48, 1)
 	case .Box:
 		return tile_source(0, 64)
+	case .Wall:
+		return tile_source(32, 0)
 	}
 	return {}
 }

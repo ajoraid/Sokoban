@@ -9,6 +9,7 @@ Editor_Tool :: enum {
 	Goal,
 	Box,
 	Player,
+	Wall,
 }
 
 process_level_editor_input :: proc(gs: ^Game_State) {
@@ -17,11 +18,17 @@ process_level_editor_input :: proc(gs: ^Game_State) {
 	if rl.IsKeyPressed(.THREE) do gs.editor_tool = .Goal
 	if rl.IsKeyPressed(.FOUR) do gs.editor_tool = .Box
 	if rl.IsKeyPressed(.FIVE) do gs.editor_tool = .Player
+	if rl.IsKeyPressed(.SIX) do gs.editor_tool = .Wall
 	mouse_pos := rl.GetMousePosition()
 	grid_pos := screen_to_grid(mouse_pos)
 	if rl.IsMouseButtonDown(.LEFT) {
 		if within_bounds(gs, grid_pos) {
 			switch gs.editor_tool {
+			case .Wall:
+				gs.level.board[grid_pos.y][grid_pos.x] = Tile {
+					kind   = .Solid,
+					visual = .Wall,
+				}
 			case .Water:
 				gs.level.board[grid_pos.y][grid_pos.x] = Tile {
 					kind   = .Solid,
@@ -81,6 +88,8 @@ set_editor_tool_text :: proc(tool: Editor_Tool) {
 	switch tool {
 	case .Water:
 		tool_text = "Water"
+	case .Wall:
+		tool_text = "Wall"
 	case .Grass:
 		tool_text = "Grass"
 	case .Goal:
