@@ -1,6 +1,7 @@
 package main
 
 import "core:os"
+import rl "vendor:raylib"
 
 Vec2i :: struct {
 	x, y: int,
@@ -45,21 +46,13 @@ Box :: struct {
 }
 
 Level :: struct {
-	width:  int,
-	height: int,
-	board:  [dynamic][dynamic]Tile,
-	player: Entity,
-	boxes:  [dynamic]Box,
+	width:       int,
+	height:      int,
+	board:       [dynamic][dynamic]Tile,
+	player:      Entity,
+	boxes:       [dynamic]Box,
+	goals_count: int,
 }
-
-
-// how im gonna map it
-/*
- ' ' -> kind = floor | visual = grass
- '#' -> kind = solid | visual = water
- '.' -> kind = goal  | visual = goal
- 'w' -> kind = solid | visual = wall
-*/
 
 load_level :: proc() -> Level {
 	level_data, ok := os.read_entire_file_from_path("src/levels/level_000.dat", context.allocator)
@@ -77,15 +70,16 @@ load_level :: proc() -> Level {
 			current_row = make([dynamic]Tile)
 			y += 1
 			x = 0
-		case 'w':
+		case 'W':
 			append(&current_row, Tile{kind = .Solid, visual = .Wall})
 		case '#':
 			append(&current_row, Tile{kind = .Solid, visual = .Water})
 			x += 1
 		case '.':
 			append(&current_row, Tile{kind = .Goal, visual = .Goal})
+			level.goals_count += 1
 			x += 1
-		case ' ':
+		case 'g':
 			append(&current_row, Tile{kind = .Floor, visual = .Grass})
 			x += 1
 		case '@':
@@ -115,4 +109,53 @@ unload_level :: proc(level: ^Level) {
 	}
 	delete(level.board)
 	delete(level.boxes)
+}
+
+tile_to_char :: proc(tile: Tile) -> u8 {
+	switch tile.kind {
+	case .Floor:
+		#partial switch tile.visual {
+		case .Grass:
+			return 'g'
+		}
+
+	case .Solid:
+		#partial switch tile.visual {
+		case .Water:
+			return '#'
+		case .Wall:
+			return 'W'
+		}
+
+	case .Goal:
+		return '.'
+	}
+	return 'a'
+}
+
+save_level :: proc(gs: ^Game_State, path: string) {
+	data := make([dynamic]u8)
+	defer delete(data)
+
+	for row, y in gs.level.board {
+		for tile, x in row {
+			pos := Vec2i{x, y}
+			ch := tile_to_char(tile)
+
+			if gs.level.player.pos == pos {
+				ch = '@'
+			} else {
+				box_exists, _ := box_at(gs, pos)
+				if box_exists do ch = '$'
+			}
+			append(&data, ch)
+		}
+
+		append(&data, '\n')
+
+	}
+
+	ok := os.write_entire_file(path, data[:])
+	if ok != nil do rl.DrawText("Failed to Saved!", 10, 40, 20, rl.RED)
+	gs.save_message_timer = 1.0
 }

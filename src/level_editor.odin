@@ -73,6 +73,7 @@ process_level_editor_input :: proc(gs: ^Game_State) {
 }
 
 render_editor :: proc(gs: ^Game_State) {
+	if gs.save_message_timer > 0 do rl.DrawText("Saved!", 10, 40, 20, rl.GREEN)
 	set_editor_tool_text(gs.editor_tool)
 	mouse_pos := rl.GetMousePosition()
 	grid_pos := screen_to_grid(mouse_pos)

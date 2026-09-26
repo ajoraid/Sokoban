@@ -1,6 +1,7 @@
 package main
 
 import "core:fmt"
+import "core:os"
 import "core:sys/wasm/wasi"
 import rl "vendor:raylib"
 
@@ -10,12 +11,13 @@ Game_Mode :: enum {
 }
 
 Game_State :: struct {
-	mode:        Game_Mode,
-	editor_tool: Editor_Tool,
-	level:       Level,
-	assets:      Assets,
-	audio:       Audio,
-	won:         bool,
+	mode:               Game_Mode,
+	editor_tool:        Editor_Tool,
+	level:              Level,
+	assets:             Assets,
+	audio:              Audio,
+	won:                bool,
+	save_message_timer: f32,
 }
 
 game_init :: proc() {
@@ -76,6 +78,11 @@ process_game_mode :: proc(gs: ^Game_State, dt: f32) {
 			rl.PlaySound(gs.audio.win)
 		}
 	case .Editing:
+		if gs.save_message_timer > 0 {
+			gs.save_message_timer -= dt
+			if gs.save_message_timer < 0 do gs.save_message_timer = 0
+		}
+		if rl.IsKeyPressed(.S) do save_level(gs, "src/levels/level_000.dat")
 		process_level_editor_input(gs)
 	}
 }
