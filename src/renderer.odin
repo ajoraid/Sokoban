@@ -3,7 +3,6 @@ package main
 import rl "vendor:raylib"
 
 render_game :: proc(gs: ^Game_State) {
-	render_background(gs)
 	render_level(gs)
 	render_player(gs)
 	render_boxes(gs)
@@ -83,16 +82,6 @@ render_boxes :: proc(gs: ^Game_State) {
 		source := get_source_for_tile(.Box)
 		dest := tile_destination(pos)
 		rl.DrawTexturePro(gs.assets.tileset, source, dest, Vec2{0, 0}, 0, rl.WHITE)
-	}
-}
-
-render_background :: proc(gs: ^Game_State) {
-	for y := 0; y < WINDOW_HEIGHT; y += TILE_SIZE {
-		for x := 0; x < WINDOW_WIDTH; x += TILE_SIZE {
-			dest := tile_destination({f32(x), f32(y)})
-			source := get_source_for_tile(.Grass)
-			rl.DrawTexturePro(gs.assets.tileset, source, dest, Vec2{0, 0}, 0, rl.WHITE)
-		}
 	}
 }
 
