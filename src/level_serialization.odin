@@ -52,12 +52,11 @@ Box :: struct {
 }
 
 Level :: struct {
-	width:       int,
-	height:      int,
-	board:       [dynamic][dynamic]Tile,
-	player:      Entity,
-	boxes:       [dynamic]Box,
-	goals_count: int,
+	width:  int,
+	height: int,
+	board:  [dynamic][dynamic]Tile,
+	player: Entity,
+	boxes:  [dynamic]Box,
 }
 
 load_level :: proc(path: string = "src/levels/level_000.dat") -> Level {
@@ -84,7 +83,6 @@ load_level :: proc(path: string = "src/levels/level_000.dat") -> Level {
 			x += 1
 		case '.':
 			append(&current_row, Tile{kind = .Goal, visual = .Goal})
-			level.goals_count += 1
 			x += 1
 		case 'g':
 			append(&current_row, Tile{kind = .Floor, visual = .Grass})

@@ -116,19 +116,17 @@ try_push_box :: proc(gs: ^Game_State, box_index: int, direction: Vec2i) -> bool 
 }
 
 did_win :: proc(gs: ^Game_State) -> bool {
-	// i added this check as its needed for editor functionality
-	// if the level is empty, it gives win message on lunch
-	// because we return true in the case where the board is empty
-	// the logic shouldn't be during a valid game, but good to have i guess
-	if len(gs.level.boxes) == 0 || gs.level.goals_count == 0 do return false
+	if len(gs.level.boxes) == 0 do return false
+	found_goal := false
 	level := &gs.level
 	for row, y in level.board {
 		for tile, x in row {
 			if tile.kind == .Goal {
+				found_goal = true
 				box_exist, _ := box_at(gs, {x, y})
 				if !box_exist do return false
 			}
 		}
 	}
-	return true
+	return found_goal
 }
