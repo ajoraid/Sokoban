@@ -2,6 +2,9 @@ package main
 
 import rl "vendor:raylib"
 
+LEVEL_WIDTH :: 25
+LEVEL_HEIGHT :: 15
+
 TILE_SIZE :: 32
 
 WINDOW_WIDTH :: 25 * TILE_SIZE

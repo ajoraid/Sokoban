@@ -1,5 +1,6 @@
 package main
 
+import "core:fmt"
 import "core:os"
 import rl "vendor:raylib"
 
@@ -54,8 +55,8 @@ Level :: struct {
 	goals_count: int,
 }
 
-load_level :: proc() -> Level {
-	level_data, ok := os.read_entire_file_from_path("src/levels/level_000.dat", context.allocator)
+load_level :: proc(path: string = "src/levels/level_000.dat") -> Level {
+	level_data, ok := os.read_entire_file_from_path(path, context.allocator)
 	defer delete(level_data)
 	assert(ok == nil, "Failed to lead level data.")
 
@@ -158,4 +159,41 @@ save_level :: proc(gs: ^Game_State, path: string) {
 	ok := os.write_entire_file(path, data[:])
 	if ok != nil do rl.DrawText("Failed to Saved!", 10, 40, 20, rl.RED)
 	gs.save_message_timer = 1.0
+	gs.level_not_saved = false
+}
+
+new_level :: proc() -> Level {
+	level := Level {
+		width  = LEVEL_WIDTH,
+		height = LEVEL_WIDTH,
+	}
+
+	for y in 0 ..< LEVEL_HEIGHT {
+		row := make([dynamic]Tile)
+		for x in 0 ..< LEVEL_WIDTH {
+			append(&row, Tile{kind = .Floor, visual = .Grass})
+		}
+		append(&level.board, row)
+	}
+	return level
+}
+
+level_path :: proc(index: int) -> string {
+	path := fmt.aprintf("src/levels/level_%03d.dat", index)
+	return path
+}
+
+try_load_level_index :: proc(gs: ^Game_State, index: int) {
+	if index < 0 do return
+	path := level_path(index)
+	defer delete(path)
+
+	if !os.exists(path) do return
+
+	unload_level(&gs.level)
+
+	gs.current_level = index
+
+	gs.level = load_level(path)
+	gs.current_level = index
 }

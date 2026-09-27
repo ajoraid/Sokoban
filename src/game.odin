@@ -2,7 +2,6 @@ package main
 
 import "core:fmt"
 import "core:os"
-import "core:sys/wasm/wasi"
 import rl "vendor:raylib"
 
 Game_Mode :: enum {
@@ -18,6 +17,8 @@ Game_State :: struct {
 	audio:              Audio,
 	won:                bool,
 	save_message_timer: f32,
+	current_level:      int,
+	level_not_saved:    bool,
 }
 
 game_init :: proc() {
@@ -25,12 +26,13 @@ game_init :: proc() {
 	rl.InitAudioDevice()
 
 	gs := Game_State {
-		mode        = .Playing,
-		editor_tool = .Grass,
-		level       = load_level(),
-		assets      = load_assets(),
-		audio       = load_audio(),
-		won         = false,
+		mode          = .Playing,
+		editor_tool   = .Grass,
+		level         = load_level(),
+		assets        = load_assets(),
+		audio         = load_audio(),
+		won           = false,
+		current_level = 0,
 	}
 
 	rl.PlayMusicStream(gs.audio.background)
@@ -82,7 +84,7 @@ process_game_mode :: proc(gs: ^Game_State, dt: f32) {
 			gs.save_message_timer -= dt
 			if gs.save_message_timer < 0 do gs.save_message_timer = 0
 		}
-		if rl.IsKeyPressed(.S) do save_level(gs, "src/levels/level_000.dat")
+		handle_level_editor_file_operations(gs)
 		process_level_editor_input(gs)
 	}
 }
