@@ -78,6 +78,7 @@ load_level :: proc(path: string = "src/levels/level_000.dat") -> Level {
 			x = 0
 		case 'W':
 			append(&current_row, Tile{kind = .Solid, visual = .Wall})
+			x += 1
 		case '#':
 			append(&current_row, Tile{kind = .Solid, visual = .Water})
 			x += 1
