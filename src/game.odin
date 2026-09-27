@@ -9,13 +9,21 @@ Game_Mode :: enum {
 	Editing,
 }
 
+Undo_State :: struct {
+	valid:      bool,
+	player_pos: Vec2i,
+	box_pos:    Vec2i,
+	box_moved:  bool,
+	box_index:  int,
+}
+
 Game_State :: struct {
 	mode:               Game_Mode,
 	editor_tool:        Editor_Tool,
+	undo:               Undo_State,
 	level:              Level,
 	assets:             Assets,
 	audio:              Audio,
-	last_moved_box:     Box,
 	won:                bool,
 	level_not_saved:    bool,
 	save_message_timer: f32,

@@ -16,13 +16,11 @@ Direction :: enum {
 }
 
 Entity :: struct {
-	pos:             Vec2i,
-	last_move:       Vec2i,
-	did_player_move: bool,
-	frame:           int,
-	animating:       bool,
-	frame_timer:     f32,
-	facing:          Direction,
+	pos:         Vec2i,
+	frame:       int,
+	animating:   bool,
+	frame_timer: f32,
+	facing:      Direction,
 }
 
 Tile_Kind :: enum {
@@ -45,10 +43,7 @@ Tile :: struct {
 }
 
 Box :: struct {
-	pos:                  Vec2i,
-	last_box_location:    Vec2i,
-	last_moved_box_index: int,
-	did_box_move:         bool,
+	pos: Vec2i,
 }
 
 Level :: struct {
