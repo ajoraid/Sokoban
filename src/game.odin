@@ -15,10 +15,11 @@ Game_State :: struct {
 	level:              Level,
 	assets:             Assets,
 	audio:              Audio,
+	last_moved_box:     Box,
 	won:                bool,
+	level_not_saved:    bool,
 	save_message_timer: f32,
 	current_level:      int,
-	level_not_saved:    bool,
 }
 
 game_init :: proc() {
@@ -36,6 +37,8 @@ game_init :: proc() {
 	}
 
 	rl.PlayMusicStream(gs.audio.background)
+	rl.PlayMusicStream(gs.audio.wave)
+	rl.SetMusicVolume(gs.audio.wave, 0.4)
 	rl.SetMusicVolume(gs.audio.background, 0.2)
 
 	defer rl.CloseWindow()
@@ -47,6 +50,7 @@ game_init :: proc() {
 		dt := rl.GetFrameTime()
 
 		rl.UpdateMusicStream(gs.audio.background)
+		rl.UpdateMusicStream(gs.audio.wave)
 
 		process_game_mode(&gs, dt)
 
