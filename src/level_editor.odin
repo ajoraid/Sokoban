@@ -132,14 +132,6 @@ handle_level_editor_file_operations :: proc(gs: ^Game_State) {
 		gs.level = new_level()
 	}
 
-	if rl.IsKeyPressed(.RIGHT) {
-		fmt.println("RIGHT PRESSED")
-		fmt.println("current before:", gs.current_level)
-		try_load_level_index(gs, gs.current_level + 1)
-		fmt.println("current after:", gs.current_level)
-	}
-
-	if rl.IsKeyPressed(.LEFT) && gs.current_level > 0 {
-		try_load_level_index(gs, gs.current_level - 1)
-	}
+	if rl.IsKeyPressed(.RIGHT) do try_load_level_index(gs, gs.current_level + 1)
+	if rl.IsKeyPressed(.LEFT) && gs.current_level > 0 do try_load_level_index(gs, gs.current_level - 1)
 }
