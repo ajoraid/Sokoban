@@ -16,11 +16,13 @@ Direction :: enum {
 }
 
 Entity :: struct {
-	pos:         Vec2i,
-	frame:       int,
-	animating:   bool,
-	frame_timer: f32,
-	facing:      Direction,
+	pos:             Vec2i,
+	last_move:       Vec2i,
+	did_player_move: bool,
+	frame:           int,
+	animating:       bool,
+	frame_timer:     f32,
+	facing:          Direction,
 }
 
 Tile_Kind :: enum {
@@ -43,7 +45,10 @@ Tile :: struct {
 }
 
 Box :: struct {
-	pos: Vec2i,
+	pos:                  Vec2i,
+	last_box_location:    Vec2i,
+	last_moved_box_index: int,
+	did_box_move:         bool,
 }
 
 Level :: struct {
@@ -165,7 +170,7 @@ save_level :: proc(gs: ^Game_State, path: string) {
 new_level :: proc() -> Level {
 	level := Level {
 		width  = LEVEL_WIDTH,
-		height = LEVEL_WIDTH,
+		height = LEVEL_HEIGHT,
 	}
 
 	for y in 0 ..< LEVEL_HEIGHT {

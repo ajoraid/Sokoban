@@ -28,14 +28,23 @@ process_input :: proc(gs: ^Game_State) {
 		direction = Vec2i{0, -1}
 		facing = .Up
 	}
+	// gotta make sure we already made a move before undo; otherwise it will
+	// return to {0, 0}
+	if rl.IsKeyPressed(.U) {
+		if gs.level.player.did_player_move do level.player.pos = level.player.last_move
+		if gs.last_moved_box.did_box_move do level.boxes[gs.last_moved_box.last_moved_box_index].pos = gs.last_moved_box.pos
+	}
 
 	if !did_move do return
 
 	next_pos := Vec2i{level.player.pos.x + direction.x, level.player.pos.y + direction.y}
 	if is_valid_move(gs, next_pos) {
 		rl.PlaySound(gs.audio.walk)
-		level.player.pos.x += direction.x
-		level.player.pos.y += direction.y
+		// handling undo
+		level.player.last_move = level.player.pos
+		level.player.did_player_move = true
+
+		level.player.pos = next_pos
 		level.player.frame = 0
 		level.player.animating = true
 		level.player.facing = facing
@@ -43,6 +52,12 @@ process_input :: proc(gs: ^Game_State) {
 		box_exists, box_index := box_at(gs, next_pos)
 		if box_exists {
 			if try_push_box(gs, box_index, direction) {
+				gs.last_moved_box.did_box_move = true
+				// handling undo after box push
+				level.player.last_move = level.player.pos
+				gs.last_moved_box.last_moved_box_index = box_index
+				gs.last_moved_box.pos = next_pos
+
 				rl.PlaySound(gs.audio.push)
 				level.player.pos = next_pos
 				level.player.frame = 0
