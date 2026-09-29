@@ -1,6 +1,5 @@
 package main
 
-import "core:sys/wasm/wasi"
 import rl "vendor:raylib"
 
 process_input :: proc(gs: ^Game_State) {
