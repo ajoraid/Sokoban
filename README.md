@@ -13,3 +13,17 @@ Sokoban made with Odin and Raylib, featuring classic box-pushing gameplay, an un
 
 ## Character Animation
 <img width="796" height="474" alt="character_animation" src="https://github.com/user-attachments/assets/87fc1010-ccc7-42b9-b452-8cc1b583dfca" />
+
+## Run
+
+Requirements:
+- Odin
+- Raylib (included in vendor:)
+
+Clone the repo, then from the project root:
+
+```bash
+odin run src
+```
+
+To access the level editor, press F1. Press S to save your changes, then press F1 again to return to gameplay.
