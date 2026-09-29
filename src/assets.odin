@@ -12,6 +12,7 @@ import rl "vendor:raylib"
 TILE_SET_ASSET_PATH :: "src/assets/tileset.png"
 MIRROR_LEFT_ASSET_PATH :: "src/assets/glass_left.png"
 MIRROR_RIGHT_ASSET_PATH :: "src/assets/glass_right.png"
+INSTRUCTION_ASSET_PATH :: "src/assets/instructions.png"
 
 // animation
 UP :: "src/assets/up1.png"
@@ -42,6 +43,7 @@ Assets :: struct {
 	tileset:      rl.Texture2D,
 	mirror_left:  rl.Texture2D,
 	mirror_right: rl.Texture2D,
+	instructions: rl.Texture2D,
 }
 
 Player_Direction :: enum {
@@ -60,6 +62,7 @@ load_assets :: proc() -> Assets {
 		tileset = rl.LoadTexture(TILE_SET_ASSET_PATH),
 		mirror_left = rl.LoadTexture(MIRROR_LEFT_ASSET_PATH),
 		mirror_right = rl.LoadTexture(MIRROR_RIGHT_ASSET_PATH),
+		instructions = rl.LoadTexture(INSTRUCTION_ASSET_PATH),
 	}
 }
 
@@ -82,6 +85,7 @@ unload_assets :: proc(assets: ^Assets) {
 	rl.UnloadTexture(assets.tileset)
 	rl.UnloadTexture(assets.mirror_left)
 	rl.UnloadTexture(assets.mirror_right)
+	rl.UnloadTexture(assets.instructions)
 }
 
 load_player_assets :: proc(direction: Player_Direction) -> [4]rl.Texture2D {

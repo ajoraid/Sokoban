@@ -230,6 +230,13 @@ new_level :: proc() -> Level {
 	return level
 }
 
+level_exists :: proc(index: int) -> bool {
+	if index < 0 do return false
+	path := level_path(index)
+	defer delete(path)
+	return os.exists(path)
+}
+
 level_path :: proc(index: int) -> string {
 	path := fmt.aprintf("src/levels/level_%03d.dat", index)
 	return path

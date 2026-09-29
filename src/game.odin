@@ -7,6 +7,9 @@ import rl "vendor:raylib"
 Game_Mode :: enum {
 	Playing,
 	Editing,
+	Level_Complete,
+	Game_Complete,
+	Restart_Level,
 }
 
 Undo_State :: struct {
@@ -76,7 +79,9 @@ game_init :: proc() {
 		render_game(&gs)
 
 		if gs.mode == .Editing do render_editor(&gs)
-		if gs.mode == .Playing && gs.won do draw_win_text()
+		if gs.mode == .Level_Complete do draw_message("Level Complete - Press ENTER to proceed")
+		if gs.mode == .Game_Complete do draw_message("Game Complete - Press Enter to restart")
+		if gs.current_level == 0 do show_game_instructions(&gs)
 
 		rl.EndDrawing()
 	}
@@ -90,6 +95,7 @@ process_game_mode :: proc(gs: ^Game_State, dt: f32) {
 			gs.mode = .Playing
 		}
 	}
+	if rl.IsKeyPressed(.R) do gs.mode = .Restart_Level
 	switch gs.mode {
 	case .Playing:
 		process_input(gs)
@@ -104,6 +110,11 @@ process_game_mode :: proc(gs: ^Game_State, dt: f32) {
 		gs.did_teleport = teleporter_active
 		if !was_won && gs.won {
 			rl.PlaySound(gs.audio.win)
+			if level_exists(gs.current_level + 1) {
+				gs.mode = .Level_Complete
+			} else {
+				gs.mode = .Game_Complete
+			}
 		}
 
 	case .Editing:
@@ -113,5 +124,41 @@ process_game_mode :: proc(gs: ^Game_State, dt: f32) {
 		}
 		handle_level_editor_file_operations(gs)
 		process_level_editor_input(gs)
+
+	case .Level_Complete:
+		draw_message("Level Complete - Press ENTER to proceed")
+		if rl.IsKeyPressed(.ENTER) {
+			next_index := gs.current_level + 1
+			if level_exists(next_index) {
+				try_load_level_index(gs, next_index)
+				gs.won = false
+				gs.undo.valid = false
+				gs.did_teleport = false
+				gs.mode = .Playing
+			} else {
+				gs.mode = .Game_Complete
+			}
+		}
+
+	case .Game_Complete:
+		if rl.IsKeyPressed(.ENTER) {
+			try_load_level_index(gs, 0)
+			gs.won = false
+			gs.undo.valid = false
+			gs.did_teleport = false
+			gs.mode = .Playing
+		}
+
+
+	case .Restart_Level:
+		try_load_level_index(gs, gs.current_level)
+		gs.won = false
+		gs.undo.valid = false
+		gs.did_teleport = false
+		gs.mode = .Playing
 	}
+}
+
+show_game_instructions :: proc(gs: ^Game_State) {
+	rl.DrawTexture(gs.assets.instructions, 0, 0, rl.WHITE)
 }

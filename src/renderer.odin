@@ -100,12 +100,13 @@ render_mirrors :: proc(gs: ^Game_State) {
 	}
 }
 
-draw_win_text :: proc() {
-	text_width := rl.MeasureText(WON_TEXT, FONT_SIZE)
+draw_message :: proc(message: cstring) {
+	text_width := rl.MeasureText(message, FONT_SIZE)
 	x := (WINDOW_WIDTH - text_width) / 2
 	y := (WINDOW_HEIGHT - FONT_SIZE) / 2
-	rl.DrawText(WON_TEXT, i32(x), i32(y), FONT_SIZE, rl.WHITE)
+	rl.DrawText(message, i32(x), i32(y), FONT_SIZE, rl.WHITE)
 }
+
 
 grid_to_screen :: proc(pos: Vec2i) -> Vec2 {
 	return {f32(pos.x) * TILE_SIZE, f32(pos.y) * TILE_SIZE}
