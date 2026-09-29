@@ -6,6 +6,7 @@ render_game :: proc(gs: ^Game_State) {
 	render_level(gs)
 	render_player(gs)
 	render_boxes(gs)
+	render_mirrors(gs)
 }
 
 render_level :: proc(gs: ^Game_State) {
@@ -82,6 +83,20 @@ render_boxes :: proc(gs: ^Game_State) {
 		source := get_source_for_tile(.Box)
 		dest := tile_destination(pos)
 		rl.DrawTexturePro(gs.assets.tileset, source, dest, Vec2{0, 0}, 0, rl.WHITE)
+	}
+}
+
+render_mirrors :: proc(gs: ^Game_State) {
+	for mirror in gs.level.mirrors {
+		pos := grid_to_screen(mirror.pos)
+		texture_name: rl.Texture2D
+		#partial switch mirror.facing {
+		case .Left:
+			texture_name = gs.assets.mirror_left
+		case .Right:
+			texture_name = gs.assets.mirror_right
+		}
+		rl.DrawTextureEx(texture_name, pos, 0, 2, rl.WHITE)
 	}
 }
 

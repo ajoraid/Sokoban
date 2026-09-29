@@ -6,6 +6,7 @@ WALK_AUDIO_PATH :: "src/audio/walk.wav"
 PUSH_AUDIO_PATH :: "src/audio/push.wav"
 GOAL_AUDIO_PATH :: "src/audio/goal.wav"
 WIN_AUDIO_PATH :: "src/audio/win.wav"
+TELEPORT_AUDIO_PATH :: "src/audio/teleport.wav"
 WAVE_AUDIO_PATH :: "src/audio/wave.wav"
 BACKGROUND_MUSIC_PATH :: "src/audio/background.wav"
 
@@ -16,6 +17,7 @@ Audio :: struct {
 	push:       rl.Sound,
 	goal:       rl.Sound,
 	win:        rl.Sound,
+	teleport:   rl.Sound,
 }
 
 load_audio :: proc() -> Audio {
@@ -26,6 +28,7 @@ load_audio :: proc() -> Audio {
 		push = rl.LoadSound(PUSH_AUDIO_PATH),
 		goal = rl.LoadSound(GOAL_AUDIO_PATH),
 		win = rl.LoadSound(WIN_AUDIO_PATH),
+		teleport = rl.LoadSound(TELEPORT_AUDIO_PATH),
 	}
 }
 
@@ -36,4 +39,5 @@ unload_audio :: proc(audio: ^Audio) {
 	rl.UnloadSound(audio.push)
 	rl.UnloadSound(audio.goal)
 	rl.UnloadSound(audio.win)
+	rl.UnloadSound(audio.teleport)
 }

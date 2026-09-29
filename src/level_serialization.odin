@@ -46,12 +46,18 @@ Box :: struct {
 	pos: Vec2i,
 }
 
+Mirror :: struct {
+	pos:    Vec2i,
+	facing: Direction,
+}
+
 Level :: struct {
-	width:  int,
-	height: int,
-	board:  [dynamic][dynamic]Tile,
-	player: Entity,
-	boxes:  [dynamic]Box,
+	width:   int,
+	height:  int,
+	board:   [dynamic][dynamic]Tile,
+	player:  Entity,
+	boxes:   [dynamic]Box,
+	mirrors: [dynamic]Mirror,
 }
 
 load_level :: proc(path: string = "src/levels/level_000.dat") -> Level {
@@ -88,9 +94,29 @@ load_level :: proc(path: string = "src/levels/level_000.dat") -> Level {
 			x += 1
 		case '$':
 			append(&current_row, Tile{kind = .Floor, visual = .Grass})
-			append(&level.boxes, Box{pos = Vec2i{x, y}})
+			append(&level.boxes, Box{pos = {x, y}})
+			x += 1
+		case 'm':
+			append(&current_row, Tile{kind = .Floor, visual = .Grass})
+			append(&level.mirrors, Mirror{pos = {x, y}, facing = .Left})
+			x += 1
+		case 'M':
+			append(&current_row, Tile{kind = .Floor, visual = .Grass})
+			append(&level.mirrors, Mirror{pos = {x, y}, facing = .Right})
+			x += 1
+		case '+':
+			append(&current_row, Tile{kind = .Goal, visual = .Grass})
+			x += 1
+		case '<':
+			append(&current_row, Tile{kind = .Goal, visual = .Grass})
+			append(&level.mirrors, Mirror{pos = {x, y}, facing = .Left})
+			x += 1
+		case '>':
+			append(&current_row, Tile{kind = .Goal, visual = .Grass})
+			append(&level.mirrors, Mirror{pos = {x, y}, facing = .Right})
 			x += 1
 		}
+
 	}
 
 	if len(current_row) > 0 {
@@ -109,6 +135,7 @@ unload_level :: proc(level: ^Level) {
 	}
 	delete(level.board)
 	delete(level.boxes)
+	delete(level.mirrors)
 }
 
 tile_to_char :: proc(tile: Tile) -> u8 {
@@ -128,7 +155,12 @@ tile_to_char :: proc(tile: Tile) -> u8 {
 		}
 
 	case .Goal:
-		return '.'
+		#partial switch tile.visual {
+		case .Goal:
+			return '.'
+		case .Grass:
+			return '+'
+		}
 	}
 	return 'a'
 }
@@ -146,7 +178,28 @@ save_level :: proc(gs: ^Game_State, path: string) {
 				ch = '@'
 			} else {
 				box_exists, _ := box_at(gs, pos)
-				if box_exists do ch = '$'
+				if box_exists {
+					ch = '$'
+				} else {
+					mirror_exists, mirror_index := mirror_at(gs, pos)
+					on_mirror_spot := tile.kind == .Goal && tile.visual == .Grass
+					if mirror_exists {
+						#partial switch gs.level.mirrors[mirror_index].facing {
+						case .Left:
+							if on_mirror_spot {
+								ch = '<'
+							} else {
+								ch = 'm'
+							}
+						case .Right:
+							if on_mirror_spot {
+								ch = '>'
+							} else {
+								ch = 'M'
+							}
+						}
+					}
+				}
 			}
 			append(&data, ch)
 		}

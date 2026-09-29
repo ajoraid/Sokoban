@@ -10,24 +10,32 @@ Game_Mode :: enum {
 }
 
 Undo_State :: struct {
-	valid:      bool,
-	player_pos: Vec2i,
-	box_pos:    Vec2i,
-	box_moved:  bool,
-	box_index:  int,
+	valid:          bool,
+	player_pos:     Vec2i,
+	box_pos:        Vec2i,
+	box_moved:      bool,
+	box_index:      int,
+	mirror_pos:     Vec2i,
+	mirror_b_pos:   Vec2i,
+	mirror_moved:   bool,
+	mirror_b_moved: bool,
+	mirror_index:   int,
+	mirror_b_index: int,
 }
 
 Game_State :: struct {
-	mode:               Game_Mode,
-	editor_tool:        Editor_Tool,
-	undo:               Undo_State,
-	level:              Level,
-	assets:             Assets,
-	audio:              Audio,
-	won:                bool,
-	level_not_saved:    bool,
-	save_message_timer: f32,
-	current_level:      int,
+	mode:                  Game_Mode,
+	editor_tool:           Editor_Tool,
+	undo:                  Undo_State,
+	level:                 Level,
+	assets:                Assets,
+	audio:                 Audio,
+	won:                   bool,
+	level_not_saved:       bool,
+	save_message_timer:    f32,
+	current_level:         int,
+	did_teleport:          bool,
+	last_moved_mirror_pos: Vec2i,
 }
 
 game_init :: proc() {
@@ -87,10 +95,17 @@ process_game_mode :: proc(gs: ^Game_State, dt: f32) {
 		process_input(gs)
 		update_player_animation(gs, dt)
 		was_won := gs.won
+		teleporter_active := did_activate_teleportation(gs)
 		gs.won = did_win(gs)
+		if teleporter_active && !gs.did_teleport {
+			teleport_player_to_other_mirror_location(gs)
+			rl.PlaySound(gs.audio.teleport)
+		}
+		gs.did_teleport = teleporter_active
 		if !was_won && gs.won {
 			rl.PlaySound(gs.audio.win)
 		}
+
 	case .Editing:
 		if gs.save_message_timer > 0 {
 			gs.save_message_timer -= dt

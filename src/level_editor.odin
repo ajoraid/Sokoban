@@ -11,6 +11,9 @@ Editor_Tool :: enum {
 	Box,
 	Player,
 	Wall,
+	Mirror_Left,
+	Mirror_Right,
+	Mirror_Spot,
 }
 
 process_level_editor_input :: proc(gs: ^Game_State) {
@@ -20,6 +23,9 @@ process_level_editor_input :: proc(gs: ^Game_State) {
 	if rl.IsKeyPressed(.FOUR) do gs.editor_tool = .Box
 	if rl.IsKeyPressed(.FIVE) do gs.editor_tool = .Player
 	if rl.IsKeyPressed(.SIX) do gs.editor_tool = .Wall
+	if rl.IsKeyPressed(.SEVEN) do gs.editor_tool = .Mirror_Left
+	if rl.IsKeyPressed(.EIGHT) do gs.editor_tool = .Mirror_Right
+	if rl.IsKeyPressed(.NINE) do gs.editor_tool = .Mirror_Spot
 	mouse_pos := rl.GetMousePosition()
 	grid_pos := screen_to_grid(mouse_pos)
 	if rl.IsMouseButtonDown(.LEFT) {
@@ -51,6 +57,17 @@ process_level_editor_input :: proc(gs: ^Game_State) {
 				if !box_exists {
 					append(&gs.level.boxes, Box{pos = grid_pos})
 				}
+			case .Mirror_Left:
+				mirror_exists, _ := mirror_at(gs, grid_pos)
+				if !mirror_exists do append(&gs.level.mirrors, Mirror{pos = grid_pos, facing = .Left})
+			case .Mirror_Right:
+				mirror_exists, _ := mirror_at(gs, grid_pos)
+				if !mirror_exists do append(&gs.level.mirrors, Mirror{pos = grid_pos, facing = .Right})
+			case .Mirror_Spot:
+				gs.level.board[grid_pos.y][grid_pos.x] = Tile {
+					kind   = .Goal,
+					visual = .Grass,
+				}
 			case .Player:
 				gs.level.player = Entity {
 					pos = grid_pos,
@@ -66,9 +83,14 @@ process_level_editor_input :: proc(gs: ^Game_State) {
 			if box_exists {
 				ordered_remove(&gs.level.boxes, index)
 			} else {
-				gs.level.board[grid_pos.y][grid_pos.x] = Tile {
-					kind   = .Floor,
-					visual = .Grass,
+				mirror_exists, index := mirror_at(gs, grid_pos)
+				if mirror_exists {
+					ordered_remove(&gs.level.mirrors, index)
+				} else {
+					gs.level.board[grid_pos.y][grid_pos.x] = Tile {
+						kind   = .Floor,
+						visual = .Grass,
+					}
 				}
 			}
 		}
@@ -114,6 +136,12 @@ set_editor_tool_text :: proc(tool: Editor_Tool) {
 		tool_text = "Box"
 	case .Player:
 		tool_text = "Player"
+	case .Mirror_Left:
+		tool_text = "Mirror_Left"
+	case .Mirror_Right:
+		tool_text = "Mirror_Right"
+	case .Mirror_Spot:
+		tool_text = "Mirror_Spot"
 	}
 
 	rl.DrawText(tool_text, 10, 10, 20, rl.WHITE)

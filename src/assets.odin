@@ -10,8 +10,8 @@ import rl "vendor:raylib"
 // player assets from -> https://gibbongl.itch.io/8-directional-gameboy-character-template
 
 TILE_SET_ASSET_PATH :: "src/assets/tileset.png"
-GLASS_LEFT_ASSET_PATH :: "src/assets/glass_left.png"
-GLASS_RIGHT_ASSET_PATH :: "src/assets/glass_right.png"
+MIRROR_LEFT_ASSET_PATH :: "src/assets/glass_left.png"
+MIRROR_RIGHT_ASSET_PATH :: "src/assets/glass_right.png"
 
 // animation
 UP :: "src/assets/up1.png"
@@ -40,8 +40,8 @@ Assets :: struct {
 	player_left:  [4]rl.Texture2D,
 	player_right: [4]rl.Texture2D,
 	tileset:      rl.Texture2D,
-	glass_left:   rl.Texture2D,
-	glass_right:  rl.Texture2D,
+	mirror_left:  rl.Texture2D,
+	mirror_right: rl.Texture2D,
 }
 
 Player_Direction :: enum {
@@ -58,8 +58,8 @@ load_assets :: proc() -> Assets {
 		player_left = load_player_assets(.Left),
 		player_right = load_player_assets(.Right),
 		tileset = rl.LoadTexture(TILE_SET_ASSET_PATH),
-		glass_left = rl.LoadTexture(GLASS_LEFT_ASSET_PATH),
-		glass_right = rl.LoadTexture(GLASS_RIGHT_ASSET_PATH),
+		mirror_left = rl.LoadTexture(MIRROR_LEFT_ASSET_PATH),
+		mirror_right = rl.LoadTexture(MIRROR_RIGHT_ASSET_PATH),
 	}
 }
 
@@ -80,8 +80,8 @@ unload_assets :: proc(assets: ^Assets) {
 		rl.UnloadTexture(texture)
 	}
 	rl.UnloadTexture(assets.tileset)
-	rl.UnloadTexture(assets.glass_left)
-	rl.UnloadTexture(assets.glass_right)
+	rl.UnloadTexture(assets.mirror_left)
+	rl.UnloadTexture(assets.mirror_right)
 }
 
 load_player_assets :: proc(direction: Player_Direction) -> [4]rl.Texture2D {
