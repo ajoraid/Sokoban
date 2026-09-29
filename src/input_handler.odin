@@ -221,23 +221,24 @@ teleport_player_to_other_mirror_location :: proc(gs: ^Game_State) {
 	gs.undo.mirror_b_pos = other_pos
 	gs.undo.mirror_b_index = other_index
 	gs.undo.mirror_b_moved = true
-	gs.level.player.pos = find_player_next_x_pos(gs, other_pos, other_index)
-	gs.level.mirrors[other_index].pos = find_teleporter_next_x_pos(gs, other_pos, other_index)
+	gs.level.player.pos = find_next_x_pos(gs, other_pos, other_index, 2)
+	gs.level.mirrors[other_index].pos = find_next_x_pos(gs, other_pos, other_index, 1)
 }
 
+// finding player and teleporter next x based on the passed x value
 // for the two methods below, it's better to check all corners to see the first
 // valid empty spot for player to teleport to; but in this game i don't care tbh
 // i know when designing a map, i want to leave an empty space next to the
 // mirror so that the player can teleport to. Another thing i could also do is
 // when editing a level, requiring the editor to provide a space by highlighting
 // in red.
-find_teleporter_next_x_pos :: proc(gs: ^Game_State, other_pos: Vec2i, other_index: int) -> Vec2i {
+find_next_x_pos :: proc(gs: ^Game_State, other_pos: Vec2i, other_index, val: int) -> Vec2i {
 	x: int
 	#partial switch gs.level.mirrors[other_index].facing {
 	case .Left:
-		x = 1
+		x = val
 	case .Right:
-		x = -1
+		x = -val
 	}
 	position := Vec2i{x, 0}
 	new_pos := Vec2i{other_pos.x + position.x, other_pos.y + position.y}
@@ -247,25 +248,6 @@ find_teleporter_next_x_pos :: proc(gs: ^Game_State, other_pos: Vec2i, other_inde
 		}
 	}
 	return {}
-}
-
-find_player_next_x_pos :: proc(gs: ^Game_State, other_pos: Vec2i, other_index: int) -> Vec2i {
-	x: int
-	#partial switch gs.level.mirrors[other_index].facing {
-	case .Left:
-		x = 2
-	case .Right:
-		x = -2
-	}
-	position := Vec2i{x, 0}
-	new_pos := Vec2i{other_pos.x + position.x, other_pos.y + position.y}
-	if within_bounds(gs, new_pos) {
-		if gs.level.board[new_pos.y][new_pos.x].kind == .Floor {
-			return new_pos
-		}
-	}
-	return {}
-
 }
 
 did_win :: proc(gs: ^Game_State) -> bool {
